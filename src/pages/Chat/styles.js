@@ -35,7 +35,7 @@ const Container = styled.div`
             width: 80%;
             display: flex;
             flex-direction: column;
-            position: relative;
+            justify-content: space-between;
 
             @media (max-width: 576px) {
                 & {
@@ -43,7 +43,12 @@ const Container = styled.div`
                 }
             }
 
-            .message {
+            .messages-container {
+                display: flex;
+                flex-direction: column;
+                overflow-y: auto;
+
+                .message {
                 min-height: 50px;
                 max-width: 300px;
                 margin-top: 5px;
@@ -71,14 +76,14 @@ const Container = styled.div`
                     }
                 }
             }
+        }
 
             .chat-inputs {
                 height: 60px;
                 width: 100%;
-                position: absolute;
-                bottom: 10px;
                 display: flex;
                 justify-content: space-between;
+                margin-bottom: 10px;
 
                 .input-message {
                     height: 100%;

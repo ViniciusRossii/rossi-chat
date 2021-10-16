@@ -3,21 +3,23 @@ import { useState, useEffect } from "react"
 import Container from "./styles"
 
 import io from 'socket.io-client'
-const socket = io('https://rossi-chat.herokuapp.com/', {transports: ['websocket']})
+const socket = io('https://rossi-chat.herokuapp.com/', { transports: ['websocket'] })
 
 export default function Chat() {
     const [myId, setMyId] = useState(null)
     const [messages, setMessages] = useState([])
 
     useEffect(() => {
-        socket.on('setId', id => {
+        socket.once('setId', id => {
             setMyId(id)
         })
     }, [])
 
     useEffect(() => {
-        socket.on('loadMessage', message => {
+        socket.once('loadMessage', message => {
             setMessages([...messages, message])
+            const messageContainerHeight = document.querySelector('.messages-container').scrollHeight
+            document.querySelector('.messages-container').scrollTo(0, messageContainerHeight)
         })
     }, [messages])
 
@@ -25,13 +27,13 @@ export default function Chat() {
         if (event.key !== 'Enter') return
         event.preventDefault()
         if (!event.currentTarget.value.trim()) return
-        socket.emit('sendMessage', {userId: myId, message: event.currentTarget.value})
+        socket.emit('sendMessage', { userId: myId, message: event.currentTarget.value })
         event.currentTarget.value = ""
     }
 
     function sendMessageButton() {
         if (!document.querySelector('#input-message').value.trim()) return
-        socket.emit('sendMessage', {userId: myId, message: document.querySelector('#input-message').value})
+        socket.emit('sendMessage', { userId: myId, message: document.querySelector('#input-message').value })
         document.querySelector('#input-message').value = ""
     }
 
@@ -45,13 +47,15 @@ export default function Chat() {
                     {/* <div className="message">
                         <p className="message-text">lorem</p>
                     </div> */}
-                    {messages.map((message, index) => {
-                        return (
-                            <div key={index} className={`message ${message.userId === myId ? 'mine' : 'not-mine'}`}>
-                                <p className="message-text">{message.message}</p>
-                            </div>
-                        )
-                    })}
+                    <div className="messages-container">
+                        {messages.map((message, index) => {
+                            return (
+                                <div key={index} className={`message ${message.userId === myId ? 'mine' : 'not-mine'}`}>
+                                    <p className="message-text">{message.message}</p>
+                                </div>
+                            )
+                        })}
+                    </div>
                     <div className="chat-inputs">
                         <textarea id="input-message" autoComplete="off" onKeyDown={sendMessage} maxLength="100" className="input-message" />
                         <button onClick={sendMessageButton} className="send-message">
